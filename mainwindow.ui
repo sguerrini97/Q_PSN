@@ -20,7 +20,7 @@
       <x>0</x>
       <y>20</y>
       <width>841</width>
-      <height>491</height>
+      <height>521</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -54,7 +54,7 @@
        <rect>
         <x>630</x>
         <y>360</y>
-        <width>61</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
@@ -67,7 +67,7 @@
        <rect>
         <x>630</x>
         <y>380</y>
-        <width>75</width>
+        <width>91</width>
         <height>23</height>
        </rect>
       </property>
@@ -78,9 +78,9 @@
      <widget class="QPushButton" name="btnRap">
       <property name="geometry">
        <rect>
-        <x>740</x>
+        <x>720</x>
         <y>400</y>
-        <width>91</width>
+        <width>111</width>
         <height>23</height>
        </rect>
       </property>
@@ -93,7 +93,7 @@
        <rect>
         <x>630</x>
         <y>420</y>
-        <width>75</width>
+        <width>91</width>
         <height>23</height>
        </rect>
       </property>
@@ -135,7 +135,7 @@
        <rect>
         <x>630</x>
         <y>50</y>
-        <width>111</width>
+        <width>201</width>
         <height>16</height>
        </rect>
       </property>
@@ -166,8 +166,8 @@
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>46</width>
-        <height>13</height>
+        <width>81</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -179,8 +179,8 @@
        <rect>
         <x>30</x>
         <y>60</y>
-        <width>46</width>
-        <height>13</height>
+        <width>81</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -192,8 +192,8 @@
        <rect>
         <x>30</x>
         <y>100</y>
-        <width>46</width>
-        <height>13</height>
+        <width>81</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -205,8 +205,8 @@
        <rect>
         <x>30</x>
         <y>140</y>
-        <width>46</width>
-        <height>13</height>
+        <width>101</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -218,8 +218,8 @@
        <rect>
         <x>30</x>
         <y>180</y>
-        <width>46</width>
-        <height>13</height>
+        <width>91</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -231,7 +231,7 @@
        <rect>
         <x>30</x>
         <y>220</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
@@ -244,7 +244,7 @@
        <rect>
         <x>30</x>
         <y>260</y>
-        <width>91</width>
+        <width>131</width>
         <height>16</height>
        </rect>
       </property>
@@ -257,7 +257,7 @@
        <rect>
         <x>30</x>
         <y>300</y>
-        <width>101</width>
+        <width>141</width>
         <height>16</height>
        </rect>
       </property>
@@ -268,7 +268,7 @@
      <widget class="QLineEdit" name="leSubGameID">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>20</y>
         <width>381</width>
         <height>20</height>
@@ -281,7 +281,7 @@
      <widget class="QLineEdit" name="leSubTitle">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>60</y>
         <width>381</width>
         <height>20</height>
@@ -291,7 +291,7 @@
      <widget class="QLineEdit" name="leSubLink">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>180</y>
         <width>381</width>
         <height>20</height>
@@ -301,7 +301,7 @@
      <widget class="QLineEdit" name="leSubRapName">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>220</y>
         <width>381</width>
         <height>20</height>
@@ -314,7 +314,7 @@
      <widget class="QLineEdit" name="leSubRapData">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>260</y>
         <width>381</width>
         <height>20</height>
@@ -327,7 +327,7 @@
      <widget class="QPlainTextEdit" name="pteSubDescription">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>300</y>
         <width>381</width>
         <height>61</height>
@@ -337,7 +337,7 @@
      <widget class="QComboBox" name="cbSubType">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>100</y>
         <width>381</width>
         <height>22</height>
@@ -417,7 +417,7 @@
      <widget class="QComboBox" name="cbSubRegion">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>140</y>
         <width>381</width>
         <height>22</height>
@@ -467,7 +467,7 @@
        <rect>
         <x>30</x>
         <y>380</y>
-        <width>81</width>
+        <width>121</width>
         <height>16</height>
        </rect>
       </property>
@@ -478,7 +478,7 @@
      <widget class="QLineEdit" name="leUploaderName">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>200</x>
         <y>380</y>
         <width>381</width>
         <height>20</height>
@@ -576,7 +576,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA</string>
      <x>0</x>
      <y>0</y>
      <width>850</width>
-     <height>21</height>
+     <height>29</height>
     </rect>
    </property>
   </widget>

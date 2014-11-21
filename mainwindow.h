@@ -62,8 +62,6 @@ private slots:
 
     void on_leSearch_textChanged(const QString &arg1);
 
-    void on_cbSubType_currentTextChanged(const QString &arg1);
-
     void on_btnSrc_clicked();
 
 private:

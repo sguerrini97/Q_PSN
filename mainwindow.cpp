@@ -183,6 +183,12 @@ void MainWindow::on_btnRap_clicked()
     size_t count = 0;
     QDir rapfolder("exdata");
 
+    if( currentContent.isEmpty() )
+    {
+        QMessageBox::information(this, "Error", "You have to select a content!");
+        return;
+    }
+
     if( !rapfolder.exists() )
     {
         rapfolder.mkpath(".");
@@ -228,12 +234,25 @@ void MainWindow::on_btnRap_clicked()
 
 void MainWindow::on_btnDownload_clicked()
 {
+    if( currentContent.isEmpty() )
+    {
+        QMessageBox::information(this, "Error", "You have to select a content!");
+        return;
+    }
     QDesktopServices::openUrl(QUrl( currentContent[COLUMN_LINK], QUrl::TolerantMode));
 }
 
 void MainWindow::on_btnLinkCopy_clicked()
 {
-    QLineEdit * linkToCopy = new QLineEdit();
+    QLineEdit * linkToCopy;
+
+    if( currentContent.isEmpty() )
+    {
+        QMessageBox::information(this, "Error", "You have to select a content!");
+        return;
+    }
+
+    linkToCopy = new QLineEdit();
     linkToCopy->setText( currentContent[COLUMN_LINK] );
     linkToCopy->selectAll();
     linkToCopy->copy();
@@ -245,22 +264,12 @@ void MainWindow::on_btnSubSubmit_clicked()
     int error = 0;
     char *c;
 
-    // chesks (step 1)
-    if( ui->cbSubType->currentText().toStdString() == "EDAT" || ui->cbSubType->currentText().toStdString() == "Demo" )
-    {
-        ui->leSubRapData->setText("");
-        ui->leSubRapName->setText("");
-    }
-    else if( ui->leSubRapName->text().length() < 36 )
-        error = 2;
-    else if( ui->leSubRapData->text().length() < 32 )
-        error = 3;
-    else if( ui->leSubGameID->text().length() < 9 )
+    // chesks
+    if( ui->leSubGameID->text().length() < 9 )
         error = 1;
     else if( !( ui->leSubLink->text().contains("http://") && ui->leSubLink->text().contains(".pkg") ) ) // more checks ?
         error = 4;
 
-    // checks (step 2)
     if( !error )
     {
         // AAAA 00000 gameid check
@@ -282,29 +291,43 @@ void MainWindow::on_btnSubSubmit_clicked()
         free(c);
     }
 
-    if( !error )
+    if( !error && !(ui->leSubRapData->text().isEmpty()) )
     {
         // rap data (hex) check
-        c = (char*) malloc( sizeof(char)*33 );
-        strcpy( c, ui->leSubRapData->text().toStdString().c_str() );
-        for( int i = 0; i < 32; i++ )
+        if( ui->leSubRapData->text().length() < 32 )
         {
-            if( (c[i] < 'A' || c[i] > 'F') && (c[i] < '0' || c[i] > '9') )
-            {
-                error = 3;
-                break;
-            }
+            error = 3;
         }
-        free(c);
+        else
+        {
+            c = (char*) malloc( sizeof(char)*33 );
+            strcpy( c, ui->leSubRapData->text().toStdString().c_str() );
+            for( int i = 0; i < 32; i++ )
+            {
+                if( (c[i] < 'A' || c[i] > 'F') && (c[i] < '0' || c[i] > '9') )
+                {
+                    error = 3;
+                    break;
+                }
+            }
+            free(c);
+        }
     }
 
-    if( !error )
+    if( !error && !(ui->leSubRapData->text().isEmpty()) )
     {
         // rap name (cid) check
-        c = (char*)malloc(sizeof(char)*37);
-        c = (char*)(ui->leSubRapName->text().toStdString().c_str());
-        error = rapNameCheck(c);
-        free(c);
+        if( ui->leSubRapData->text().length() < 36 )
+        {
+            error = 2;
+        }
+        else
+        {
+            c = (char*)malloc(sizeof(char)*37);
+            c = (char*)(ui->leSubRapName->text().toStdString().c_str());
+            error = rapNameCheck(c);
+            free(c);
+        }
     }
 
     switch( error )
@@ -375,20 +398,6 @@ void MainWindow::on_leSubRapData_textChanged(const QString &arg1)
 void MainWindow::on_leSubRapName_textChanged(const QString &arg1)
 {
     ui->leSubRapName->setText( arg1.toUpper() );
-}
-
-void MainWindow::on_cbSubType_currentTextChanged(const QString &arg1)
-{
-    if( arg1.toStdString() == "EDAT" || arg1.toStdString() == "Demo" )
-    {
-        ui->leSubRapData->setEnabled(false);
-        ui->leSubRapName->setEnabled(false);
-    }
-    else
-    {
-        ui->leSubRapData->setEnabled(true);
-        ui->leSubRapName->setEnabled(true);
-    }
 }
 
 void MainWindow::on_btnSrc_clicked()
