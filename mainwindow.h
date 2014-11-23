@@ -16,10 +16,9 @@
 #include <QtNetwork/QNetworkRequest>
 
 #define DBPATH  "./offline_db"
-#define CFGPATH "./qpsn.cfg"
 
-#define REMOTEDB    "/db"
-#define REMOTENEWS  "/news"
+#define REMOTEDB    "http://qpsn.besaba.com/db.php"
+#define REMOTENEWS  "http://qpsn.besaba.com/news"
 
 #define CONTENT_COLUMNS 4
 
@@ -73,7 +72,6 @@ private:
     QTextStream * dbStream;
     QStandardItemModel * model;
     int rapNameCheck(char *r);
-    char *dbUrl, *newsUrl;
 };
 
 #endif // MAINWINDOW_H

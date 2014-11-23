@@ -29,11 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QString s;
     QStringList sList;
     bool usingOfflineDB = false;
-    QFile *config = NULL;
-    QTextStream *cfgStream = NULL;
-
-    dbUrl = NULL;
-    newsUrl = NULL;
 
     // Window setup
     ui->setupUi(this);
@@ -42,49 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelSearchResult->setText("");
     ui->labelLogo->setText("");
     this->setFixedSize( size() );
-
-    // Config file
-    config = new QFile( CFGPATH );
-    if( !(config->exists()) )
-    {
-        delete config;
-        QMessageBox::information(this, "Error", "Cannot find configuration file.");
-        exit(1);
-    }
-
-    if( !(config->open( QFile::ReadOnly | QFile::Text )) )
-    {
-        delete config;
-        QMessageBox::information(this, "Error", "Error reading configuration file.");
-        exit(1);
-    }
-
-    cfgStream = new QTextStream( config );
-    while( !cfgStream->atEnd() )
-    {
-        s = cfgStream->readLine();
-        sList = s.split("=");
-
-        if( sList[0] == "mirror" )
-        {
-            dbUrl = (char*) malloc( sizeof(char)*sList[1].length()+strlen(REMOTEDB)+1 );
-            strcpy( dbUrl, sList[1].toStdString().c_str() );
-            strcat( dbUrl, REMOTEDB );
-            newsUrl = (char*) malloc( sizeof(char)*sList[1].length()+strlen(REMOTENEWS)+1 );
-            strcpy( newsUrl, sList[1].toStdString().c_str() );
-            strcat( newsUrl, REMOTENEWS );
-        }
-    }
-
-    config->close();
-    delete config;
-    delete cfgStream;
-
-    if( !dbUrl || !newsUrl )
-    {
-        QMessageBox::information(this, "Error", "Invalid configuration file.");
-        exit(2);
-    }
 
     // Database
     database = new QFile( DBPATH );
@@ -112,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(!usingOfflineDB)
     {
         QNetworkAccessManager managerdb;
-        QNetworkRequest requestdb(QUrl( (const char*)dbUrl ));
+        QNetworkRequest requestdb(QUrl( REMOTEDB ));
         QNetworkReply *replydb(managerdb.get(requestdb));
         QEventLoop loopdb;
         QObject::connect(replydb, SIGNAL(finished()), &loopdb, SLOT(quit()));
@@ -150,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // get news
     QNetworkAccessManager managernews;
-    QNetworkRequest requestnews(QUrl( (const char *)newsUrl ));
+    QNetworkRequest requestnews(QUrl( REMOTENEWS ));
     QNetworkReply *replynews(managernews.get(requestnews));
     QEventLoop loopnews;
     QObject::connect(replynews, SIGNAL(finished()), &loopnews, SLOT(quit()));
@@ -199,10 +151,7 @@ MainWindow::~MainWindow()
         database->close();
     if(model)
         delete model;
-    if(dbUrl)
-        free(dbUrl);
-    if(newsUrl)
-        free(newsUrl);
+
     delete ui;
 }
 
@@ -399,7 +348,7 @@ void MainWindow::on_btnSubSubmit_clicked()
         break;
     default:
         QUrl url = QUrl(
-                    QString("http://qpsn.byethost12.com/submit.php?gameid=%1&title=%2&type=%3&region=%4&link=%5&rapname=%6.rap&rapdata=%7&description=%8&uploadby=%9")
+                    QString("http://qpsn.besaba.com/submit.php?gameid=%1&title=%2&type=%3&region=%4&link=%5&rapname=%6.rap&rapdata=%7&description=%8&uploadby=%9")
                     .arg( ui->leSubGameID->text(), ui->leSubTitle->text(), ui->cbSubType->currentText(),
                           ui->cbSubRegion->currentText(), ui->leSubLink->text(), ui->leSubRapName->text(),
                           ui->leSubRapData->text(), ui->pteSubDescription->toPlainText(), ui->leUploaderName->text() ) );
