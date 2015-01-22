@@ -81,7 +81,10 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     dbStream->seek(0);
 
-    model = new QStandardItemModel( lines, CONTENT_COLUMNS, this);
+    proxy_model_title = new QSortFilterProxyModel();
+    proxy_model_type = new QSortFilterProxyModel();
+
+    model = new QStandardItemModel( lines, COLUMN_MAX, this);
     model->setHorizontalHeaderItem(0, new QStandardItem( QString("ID") ));
     model->setHorizontalHeaderItem(1, new QStandardItem( QString("Title") ));
     model->setHorizontalHeaderItem(2, new QStandardItem( QString("Type") ));
@@ -91,14 +94,30 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         s = dbStream->readLine();
         sList = s.split(";");
-        for( unsigned int j = 0; j < CONTENT_COLUMNS; j++ )
+        for( unsigned int j = 0; j < COLUMN_MAX; j++ )
         {
             riga = new QStandardItem( sList[j] );
             riga->setEditable(false);
             model->setItem( i, j, riga );
         }
     }
-    ui->tableViewContent->setModel(model);
+    ui->tableViewContent->setModel( proxy_model_title );
+    proxy_model_title->setSourceModel( proxy_model_type );
+    proxy_model_type->setSourceModel( model );
+
+    proxy_model_type->setFilterKeyColumn( COLUMN_TYPE );
+    proxy_model_title->setFilterCaseSensitivity( Qt::CaseInsensitive );
+
+    s = "Total entries: ";
+    s.append( QString::number( lines, 10 ) );
+
+    ui->labelTotalEntries->setText( s );
+
+    // hide "service" columns
+    for( int i = 4; i < COLUMN_MAX; i++ )
+    {
+        ui->tableViewContent->hideColumn( i );
+    }
 
     // get news
     QNetworkAccessManager managernews;
@@ -115,33 +134,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::on_leSearch_textChanged(const QString &arg1)
 {
-    // search for title or game id
-    QAbstractItemModel * modl = ui->tableViewContent->model();
-    QSortFilterProxyModel proxy;
-    proxy.setSourceModel(modl);
-    proxy.setFilterKeyColumn( COLUMN_TITLE );
-    proxy.setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxy.setFilterFixedString( arg1.trimmed() );
+    proxy_model_title->setFilterKeyColumn( COLUMN_TITLE );
+    proxy_model_title->setFilterRegExp( arg1 );
 
-    QModelIndex matchingIndex = proxy.mapToSource(proxy.index(0, 0));
-    if( matchingIndex.isValid() )
+    if( proxy_model_title->rowCount() == 0 )
     {
-        ui->tableViewContent->scrollTo( matchingIndex, QAbstractItemView::EnsureVisible );
-        ui->labelSearchResult->setText("");
-    }
-    else
-    {
-        proxy.setFilterKeyColumn( COLUMN_GAMEID );
-        proxy.setFilterCaseSensitivity(Qt::CaseInsensitive);
-        proxy.setFilterFixedString( arg1.trimmed() );
-        matchingIndex = proxy.mapToSource( proxy.index(0, 0) );
-        if( matchingIndex.isValid() )
-        {
-            ui->tableViewContent->scrollTo( matchingIndex, QAbstractItemView::EnsureVisible );
-            ui->labelSearchResult->setText("");
-        }
-        else
-            ui->labelSearchResult->setText("No content found");
+        proxy_model_title->setFilterKeyColumn( COLUMN_GAMEID );
+        proxy_model_title->setFilterRegExp( arg1 );
     }
 }
 
@@ -149,8 +148,13 @@ MainWindow::~MainWindow()
 {
     if( database->isOpen() )
         database->close();
+
     if(model)
         delete model;
+    if( proxy_model_title )
+        delete proxy_model_title;
+    if( proxy_model_type )
+        delete proxy_model_type;
 
     delete ui;
 }
@@ -159,19 +163,22 @@ void MainWindow::on_tableViewContent_clicked(const QModelIndex &index)
 {
     QString s;
 
-    dbStream->seek(0);
+    if( index.isValid() )
+    {
+        ui->btnDownload->setEnabled( true );
+        ui->btnLinkCopy->setEnabled( true );
+    }
 
-    for( int i = 0; i < index.row()+1; i++ )
-        s = dbStream->readLine();
+    ui->pteDescription->setPlainText( ui->tableViewContent->model()->data( proxy_model_title->index( index.row(), COLUMN_DESC )).toString() );
 
-    currentContent = s.split(";");
-    ui->pteDescription->setPlainText( currentContent[ COLUMN_DESC ] );
-    if( !( currentContent[COLUMN_UPLOADBY].isEmpty() || currentContent[COLUMN_UPLOADBY].isNull() ) )
-        ui->labelUploadedBy->setText( currentContent[COLUMN_UPLOADBY] );
+    s = ui->tableViewContent->model()->data( proxy_model_title->index( index.row(), COLUMN_UPLOADBY )).toString();
+    if( !( s.length() == 0 ) )
+        ui->labelUploadedBy->setText( s );
     else
         ui->labelUploadedBy->setText("");
 
-    if( currentContent[COLUMN_RAPDATA].length() == 0 )
+    s = ui->tableViewContent->model()->data( proxy_model_title->index( index.row(), COLUMN_RAPDATA )).toString();
+    if( s.length() == 0 )
         ui->btnRap->setEnabled(false);
     else
         ui->btnRap->setEnabled(true);
@@ -185,11 +192,7 @@ void MainWindow::on_btnRap_clicked()
     size_t count = 0;
     QDir rapfolder("exdata");
 
-    if( currentContent.isEmpty() )
-    {
-        QMessageBox::information(this, "Error", "You have to select a content!");
-        return;
-    }
+    QString s;
 
     if( !rapfolder.exists() )
     {
@@ -203,7 +206,8 @@ void MainWindow::on_btnRap_clicked()
 
     rapPath = (char*) malloc( sizeof(char)*256 );
     strcpy(rapPath, "exdata/");
-    strcat(rapPath, currentContent[COLUMN_RAPNAME].toStdString().c_str() );
+    s = ui->tableViewContent->model()->data( proxy_model_title->index( ui->tableViewContent->selectionModel()->selectedIndexes()[0].row(), COLUMN_RAPNAME ) ).toString();
+    strcat(rapPath, s.toStdString().c_str() );
 
     rapFile = fopen( rapPath, "wb" );
     if(!rapFile)
@@ -214,7 +218,8 @@ void MainWindow::on_btnRap_clicked()
     }
 
     hexstring = (char*) malloc( sizeof(char)*33 );
-    strcpy(hexstring, currentContent[COLUMN_RAPDATA].toStdString().c_str() );
+    s = ui->tableViewContent->model()->data( proxy_model_title->index( ui->tableViewContent->selectionModel()->selectedIndexes()[0].row(), COLUMN_RAPDATA ) ).toString();
+    strcpy(hexstring, s.toStdString().c_str() );
 
     pos = hexstring;
 
@@ -236,26 +241,17 @@ void MainWindow::on_btnRap_clicked()
 
 void MainWindow::on_btnDownload_clicked()
 {
-    if( currentContent.isEmpty() )
-    {
-        QMessageBox::information(this, "Error", "You have to select a content!");
-        return;
-    }
-    QDesktopServices::openUrl(QUrl( currentContent[COLUMN_LINK], QUrl::TolerantMode));
+    QString s = ui->tableViewContent->model()->data( proxy_model_title->index( ui->tableViewContent->selectionModel()->selectedIndexes()[0].row(), COLUMN_LINK ) ).toString();
+    QDesktopServices::openUrl(QUrl( s, QUrl::TolerantMode));
 }
 
 void MainWindow::on_btnLinkCopy_clicked()
 {
     QLineEdit * linkToCopy;
-
-    if( currentContent.isEmpty() )
-    {
-        QMessageBox::information(this, "Error", "You have to select a content!");
-        return;
-    }
+    QString s = ui->tableViewContent->model()->data( proxy_model_title->index( ui->tableViewContent->selectionModel()->selectedIndexes()[0].row(), COLUMN_LINK ) ).toString();
 
     linkToCopy = new QLineEdit();
-    linkToCopy->setText( currentContent[COLUMN_LINK] );
+    linkToCopy->setText( s );
     linkToCopy->selectAll();
     linkToCopy->copy();
     delete linkToCopy;
@@ -405,4 +401,16 @@ void MainWindow::on_leSubRapName_textChanged(const QString &arg1)
 void MainWindow::on_btnSrc_clicked()
 {
     QDesktopServices::openUrl(QUrl( "https://github.com/sguerrini97/Q_PSN", QUrl::TolerantMode));
+}
+
+void MainWindow::on_cbFilter_currentTextChanged(const QString &arg1)
+{
+    if( arg1 == "All" )
+    {
+        proxy_model_type->setFilterRegExp("");
+    }
+    else
+    {
+        proxy_model_type->setFilterRegExp( arg1 );
+    }
 }

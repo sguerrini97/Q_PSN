@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <cstdio>
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QFile>
@@ -14,13 +15,12 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
+#include <QtSql/QtSql>
 
 #define DBPATH  "./offline_db"
 
 #define REMOTEDB    "http://qpsn.besaba.com/db.php"
 #define REMOTENEWS  "http://qpsn.besaba.com/news"
-
-#define CONTENT_COLUMNS 4
 
 #define COLUMN_GAMEID   0
 #define COLUMN_TITLE    1
@@ -31,6 +31,7 @@
 #define COLUMN_RAPDATA  6
 #define COLUMN_DESC     7
 #define COLUMN_UPLOADBY 8
+#define COLUMN_MAX      9
 
 namespace Ui {
 class MainWindow;
@@ -65,12 +66,14 @@ private slots:
 
     void on_btnSrc_clicked();
 
+    void on_cbFilter_currentTextChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
-    QStringList currentContent;
     QFile * database;
     QTextStream * dbStream;
     QStandardItemModel * model;
+    QSortFilterProxyModel *proxy_model_title, *proxy_model_type;
     int rapNameCheck(char *r);
 };
 
