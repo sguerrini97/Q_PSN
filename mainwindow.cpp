@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 - Guerrini Samuele
+    Copyright (C) 2014,2015 - sguerrini97
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelSearchResult->setText("");
     ui->labelLogo->setText("");
     this->setFixedSize( size() );
+    this->setWindowTitle( "Q_PSN - " VERSION );
 
     // Database
     database = new QFile( DBPATH );
@@ -312,17 +313,17 @@ void MainWindow::on_btnSubSubmit_clicked()
         }
     }
 
-    if( !error && !(ui->leSubRapData->text().isEmpty()) )
+    if( !error && !(ui->leSubRapName->text().isEmpty()) )
     {
         // rap name (cid) check
-        if( ui->leSubRapData->text().length() < 36 )
+        if( ui->leSubRapName->text().length() < 36 )
         {
             error = 2;
         }
         else
         {
-            c = (char*)malloc(sizeof(char)*37);
-            c = (char*)(ui->leSubRapName->text().toStdString().c_str());
+            c = (char*)malloc( sizeof(char)*37 );
+            strcpy( c, ui->leSubRapName->text().toStdString().c_str() );
             error = rapNameCheck(c);
             free(c);
         }
