@@ -585,7 +585,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Submit</string>
+       <string>Submit (*)</string>
       </property>
      </widget>
      <widget class="QLabel" name="lSubUploader">
@@ -609,6 +609,19 @@
         <width>381</width>
         <height>20</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lIPWarning">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>450</y>
+        <width>821</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>(*) Your IP and the current date and time will be temporarily stored in the database.</string>
       </property>
      </widget>
     </widget>
