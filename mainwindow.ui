@@ -434,7 +434,7 @@
        </rect>
       </property>
       <property name="maxLength">
-       <number>40</number>
+       <number>36</number>
       </property>
      </widget>
      <widget class="QLineEdit" name="leSubRapData">

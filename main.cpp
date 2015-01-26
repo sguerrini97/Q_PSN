@@ -21,6 +21,9 @@
 
 int main(int argc, char *argv[])
 {
+    printf( "Hi there :)\nExtra command line arguments:\n\n\t%s", argv[0] );
+    printf( " [ <remote db> <remote submit.php> ]\n\n" );
+
     QApplication a(argc, argv);
     MainWindow w;
     w.show();

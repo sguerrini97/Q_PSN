@@ -39,8 +39,10 @@
 
 #define VERSION "0.3"
 
-#define REMOTEDB    "http://qpsn.besaba.com/db.php"
-#define REMOTENEWS  "http://qpsn.besaba.com/news"
+#define REMOTEDB_DEF        "http://qpsn.besaba.com/db.php"
+#define REMOTESUBMIT_DEF    "http://qpsn.besaba.com/submit.php"
+#define REMOTESUBMITARGS_DEF    "?gameid=%1&title=%2&type=%3&region=%4&link=%5&rapname=%6.rap&rapdata=%7&description=%8&uploadby=%9"
+#define REMOTENEWS          "http://qpsn.besaba.com/news"
 
 #define COLUMN_GAMEID   0
 #define COLUMN_TITLE    1
@@ -94,7 +96,10 @@ private:
     QTextStream * dbStream;
     QStandardItemModel * model;
     QSortFilterProxyModel *proxy_model_title, *proxy_model_type;
-    int rapNameCheck(char *r);
+    int rapNameCheck( const char *r );
+
+    char REMOTEDB[256];
+    char REMOTESUBMIT[256];
 };
 
 #endif // MAINWINDOW_H

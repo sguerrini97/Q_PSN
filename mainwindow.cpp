@@ -29,6 +29,21 @@ MainWindow::MainWindow(QWidget *parent) :
     QString s;
     QStringList sList;
     bool usingOfflineDB = false;
+    strcpy( REMOTEDB, REMOTEDB_DEF );
+    strcpy( REMOTESUBMIT, REMOTESUBMIT_DEF );
+
+    if( QApplication::arguments().count() > 1 )
+    {
+        printf("Using custom database: %s\n", QApplication::arguments().at(1).toStdString().c_str() );
+        strcpy( REMOTEDB, QApplication::arguments().at(1).toStdString().c_str() );
+        if( QApplication::arguments().count() > 2 )
+        {
+            printf("Using custom sumbission: %s\n", QApplication::arguments().at(2).toStdString().c_str() );
+            strcpy( REMOTESUBMIT, QApplication::arguments().at(2).toStdString().c_str() );
+        }
+    }
+
+    strcat( REMOTESUBMIT, REMOTESUBMITARGS_DEF );
 
     // Window setup
     ui->setupUi(this);
@@ -65,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(!usingOfflineDB)
     {
         QNetworkAccessManager managerdb;
-        QNetworkRequest requestdb(QUrl( REMOTEDB ));
+        QNetworkRequest requestdb(QUrl( QString::fromUtf8( REMOTEDB ) ));
         QNetworkReply *replydb(managerdb.get(requestdb));
         QEventLoop loopdb;
         QObject::connect(replydb, SIGNAL(finished()), &loopdb, SLOT(quit()));
@@ -345,7 +360,7 @@ void MainWindow::on_btnSubSubmit_clicked()
         break;
     default:
         QUrl url = QUrl(
-                    QString("http://qpsn.besaba.com/submit.php?gameid=%1&title=%2&type=%3&region=%4&link=%5&rapname=%6.rap&rapdata=%7&description=%8&uploadby=%9")
+                    QString( REMOTESUBMIT )
                     .arg( ui->leSubGameID->text(), ui->leSubTitle->text(), ui->cbSubType->currentText(),
                           ui->cbSubRegion->currentText(), ui->leSubLink->text(), ui->leSubRapName->text(),
                           ui->leSubRapData->text(), ui->pteSubDescription->toPlainText(), ui->leUploaderName->text() ) );
@@ -358,7 +373,7 @@ void MainWindow::on_btnSubSubmit_clicked()
     }
 }
 
-int MainWindow::rapNameCheck(char *r)
+int MainWindow::rapNameCheck( const char *r )
 {
     int i;
 
